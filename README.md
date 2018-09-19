@@ -3,7 +3,7 @@
 
 ## Getting started
 
-`$ npm install react-native-calendar-util --save`
+`$ npm install kkhung0829/react-native-calendar-util --save`
 
 ### Mostly automatic installation
 
