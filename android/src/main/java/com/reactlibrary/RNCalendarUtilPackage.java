@@ -25,4 +25,9 @@ public class RNCalendarUtilPackage implements ReactPackage {
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
       return Collections.emptyList();
     }
+
+    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        RNCalendarUtilModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 }
