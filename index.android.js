@@ -11,7 +11,6 @@ export default {
     async authorizationStatus() {
         return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CALENDAR)
             .then(isAuthorized => {
-console.log('authorizationStatus: ' + isAuthorized);
                 if (isAuthorized) {
                     return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR);
                 } else{
@@ -25,7 +24,6 @@ console.log('authorizationStatus: ' + isAuthorized);
             PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
             PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR,
         ]).then(result => {
-console.log('authorizeEventStore: ' + JSON.stringify(result));
             return (result[PermissionsAndroid.PERMISSIONS.READ_CALENDAR] === PermissionsAndroid.RESULTS.GRANTED
                     && result[PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR] === PermissionsAndroid.RESULTS.GRANTED);
         })
