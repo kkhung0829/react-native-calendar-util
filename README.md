@@ -1,53 +1,177 @@
+# React Native Calendar Util
 
-# react-native-calendar-util
+A React Native module to help access and save events to iOS and Android calendars.
+
+## Table of contents
+- [**Getting started**](#getting-started)
+  - [Install](#step-1---install)
+  - [Link the library](#step-2---link-the-library)
+  - [OS specific setup](#step-3---os-specific-setup)
+- [**API methods**](#api)
+  - [authorizationStatus](#authorizationstatus)
+  - [authorizeEventStore](#authorizeeventstore)
+  - [listCalendars](#listcalendars)
+  - [createCalendar](#createcalendar)
+  - [deleteCalendar](#deletecalendar)
+  - [getCalendarOptions](#getcalendaroptions)
+  - [createEvent](#createevent)
+  - [createEventWithOptions](#createeventwithoptions)
 
 ## Getting started
+This package assumes that you already have a React Native project or are familiar with React Native. If not, checkout the official documentation for more details about getting started with [React Native](https://facebook.github.io/react-native/docs/getting-started.html).
+<br/>
 
-`$ npm install kkhung0829/react-native-calendar-util --save`
+The following is **required** for the package to work properly.
 
-### Mostly automatic installation
+### Step 1. - Install
+Install the `react-native-calendar-util` library with native code.
 
-`$ react-native link react-native-calendar-util`
-
-### Manual installation
-
-
-#### iOS
-
-1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
-2. Go to `node_modules` ➜ `react-native-calendar-util` and add `RNCalendarUtil.xcodeproj`
-3. In XCode, in the project navigator, select your project. Add `libRNCalendarUtil.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Run your project (`Cmd+R`)<
-
-#### Android
-
-1. Open up `android/app/src/main/java/[...]/MainActivity.java`
-  - Add `import com.reactlibrary.RNCalendarUtilPackage;` to the imports at the top of the file
-  - Add `new RNCalendarUtilPackage()` to the list returned by the `getPackages()` method
-2. Append the following lines to `android/settings.gradle`:
-  	```
-  	include ':react-native-calendar-util'
-  	project(':react-native-calendar-util').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-calendar-util/android')
-  	```
-3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-  	```
-      compile project(':react-native-calendar-util')
-  	```
-
-#### Windows
-[Read it! :D](https://github.com/ReactWindows/react-native)
-
-1. In Visual Studio add the `RNCalendarUtil.sln` in `node_modules/react-native-calendar-util/windows/RNCalendarUtil.sln` folder to their solution, reference from their app.
-2. Open up your `MainPage.cs` app
-  - Add `using Calendar.Util.RNCalendarUtil;` to the usings at the top of the file
-  - Add `new RNCalendarUtilPackage()` to the `List<IReactPackage>` returned by the `Packages` method
-
-
-## Usage
-```javascript
-import RNCalendarUtil from 'react-native-calendar-util';
-
-// TODO: What to do with the module?
-RNCalendarUtil;
 ```
-  
+npm install --save kkhung0829/react-native-calendar-util
+```
+
+### Step 2. - Link the library
+Since this package contains native code, you will need to include the code as a library. The React Native documentation on ["Linking Libraries"](https://facebook.github.io/react-native/docs/linking-libraries-ios.html) also provides some details for this process.
+
++ **Automatic linking**
+```
+react-native link
+```
+
++ **Manual linking**<br/>
+Sometimes "automatic linking" is not sufficient or is not properly including the library. Fortunately, the React Native docs on ["Manual Linking"](https://facebook.github.io/react-native/docs/linking-libraries-ios.html#manual-linking) serves a helpful guide (with pictures) in the process.
+
+### Step 3. - OS specific setup
+
+- [**iOS specific instructions**](https://github.com/wmcmahan/react-native-calendar-events/wiki/iOS-setup)<br/> iOS specific requirements, such as mandatory privacy usage descriptions and including the `EventKit.framework`.
+
+- [**Android specific instructions**](https://github.com/wmcmahan/react-native-calendar-events/wiki/Android-setup)<br/> Android specific requirements, such as mandatory application permissions.
+
+<br/>
+
+## API
+The following API allows for interacting with both iOS and Android device calendars. See the full list of available [event fields](#event-fields).
+
+
+```javascript
+import RNCalendarEvents from 'react-native-calendar-events';
+```
+
+<br/>
+
+### authorizationStatus
+Get calendar authorization status.
+
+```javascript
+RNCalendarEvents.authorizationStatus()
+```
+
+Returns: **Promise** 
+- fulfilled: String - `denied`, `restricted`, `authorized` or `undetermined`
+- rejected: Error
+
+<br/>
+
+### authorizeEventStore
+Request calendar authorization. Authorization must be granted before accessing calendar events.
+
+> Android note: This is only necessary for targeted SDK of 23 and higher.
+
+```javascript
+RNCalendarEvents.authorizeEventStore()
+```
+
+Returns: **Promise** 
+ - fulfilled: String - `denied`, `restricted`, `authorized` or `undetermined`
+ - rejected: Error
+
+<br/>
+
+### listCalendars
+List all the calendars on the device.
+
+```javascript
+RNCalendarEvents.listCalendars()
+```
+
+Returns: **Promise** 
+ - fulfilled: Array - A list of known calendars on the device
+ - rejected: Error
+
+<br/>
+
+### createCalendar
+Create calendars on the device.
+
+```javascript
+RNCalendarEvents.createCalendar(name)
+```
+
+Returns: **Promise** 
+ - fulfilled: The new calendar id
+ - rejected: Error
+
+<br/>
+
+### deleteCalendar
+Delete calendars on the device.
+
+```javascript
+RNCalendarEvents.deleteCalendar(name)
+```
+
+Returns: **Promise** 
+ - fulfilled: Nothing
+ - rejected: Error
+
+<br/>
+
+### getCalendarOptions
+Returns the default calendar options.
+
+```javascript
+RNCalendarEvents.getCalendarOptions()
+```
+
+Returns: An object with the default calendar options
+<br/>
+
+### createEvent
+Create an event.
+
+```javascript
+RNCalendarEvents.createEvent(title, location, notes, startTimeMS, endTimeMS)
+```
+
+Arguments: 
+ - title: The event title
+ - location: The event location
+ - notes: The event notes
+ - startTimeMS: The event start date in numeric value (date.getTime())
+ - endTimeMS: The event end date in numeric value (date.getTime())
+
+Returns: **Promise** 
+ - fulfilled: The new event id.
+ - rejected: Error
+
+<br/>
+
+### createEventWithOptions
+Create an event.
+
+```javascript
+RNCalendarEvents.createEventWithOptions(title, location, notes, startTimeMS, endTimeMS, options)
+```
+
+Arguments: 
+ - title: The event title
+ - location: The event location
+ - notes: The event notes
+ - startTimeMS: The event start date in numeric value (date.getTime())
+ - endTimeMS: The event end date in numeric value (date.getTime())
+ - options: Additional options obtained by getCalendarOptions().
+
+Returns: **Promise** 
+ - fulfilled: The new event id.
+ - rejected: Error
+<br/>
