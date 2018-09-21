@@ -54,7 +54,7 @@ The following API allows for interacting with both iOS and Android device calend
 
 
 ```javascript
-import RNCalendarEvents from 'react-native-calendar-events';
+import RNCalendarUtil from 'react-native-calendar-util';
 ```
 
 <br/>
@@ -63,11 +63,11 @@ import RNCalendarEvents from 'react-native-calendar-events';
 Get calendar authorization status.
 
 ```javascript
-RNCalendarEvents.authorizationStatus()
+RNCalendarUtil.authorizationStatus()
 ```
 
 Returns: **Promise** 
-- fulfilled: String - `denied`, `restricted`, `authorized` or `undetermined`
+- fulfilled: Boolean
 - rejected: Error
 
 <br/>
@@ -78,11 +78,11 @@ Request calendar authorization. Authorization must be granted before accessing c
 > Android note: This is only necessary for targeted SDK of 23 and higher.
 
 ```javascript
-RNCalendarEvents.authorizeEventStore()
+RNCalendarUtil.authorizeEventStore()
 ```
 
 Returns: **Promise** 
- - fulfilled: String - `denied`, `restricted`, `authorized` or `undetermined`
+ - fulfilled: Boolean
  - rejected: Error
 
 <br/>
@@ -91,7 +91,7 @@ Returns: **Promise**
 List all the calendars on the device.
 
 ```javascript
-RNCalendarEvents.listCalendars()
+RNCalendarUtil.listCalendars()
 ```
 
 Returns: **Promise** 
@@ -104,7 +104,7 @@ Returns: **Promise**
 Create calendars on the device.
 
 ```javascript
-RNCalendarEvents.createCalendar(name)
+RNCalendarUtil.createCalendar(name)
 ```
 
 Returns: **Promise** 
@@ -117,7 +117,7 @@ Returns: **Promise**
 Delete calendars on the device.
 
 ```javascript
-RNCalendarEvents.deleteCalendar(name)
+RNCalendarUtil.deleteCalendar(name)
 ```
 
 Returns: **Promise** 
@@ -130,7 +130,7 @@ Returns: **Promise**
 Returns the default calendar options.
 
 ```javascript
-RNCalendarEvents.getCalendarOptions()
+RNCalendarUtil.getCalendarOptions()
 ```
 
 Returns: An object with the default calendar options
@@ -140,7 +140,7 @@ Returns: An object with the default calendar options
 Create an event.
 
 ```javascript
-RNCalendarEvents.createEvent(title, location, notes, startTimeMS, endTimeMS)
+RNCalendarUtil.createEvent(title, location, notes, startTimeMS, endTimeMS)
 ```
 
 Arguments: 
@@ -160,7 +160,7 @@ Returns: **Promise**
 Create an event.
 
 ```javascript
-RNCalendarEvents.createEventWithOptions(title, location, notes, startTimeMS, endTimeMS, options)
+RNCalendarUtil.createEventWithOptions(title, location, notes, startTimeMS, endTimeMS, options)
 ```
 
 Arguments: 

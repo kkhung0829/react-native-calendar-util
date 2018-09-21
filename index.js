@@ -1,51 +1,13 @@
+'use strict';
 
-import { NativeModules } from 'react-native';
+import { Platform } from 'react-native';
 
-const { RNCalendarUtil } = NativeModules;
+let RNCalendarUtil;
 
-export default {
-    async authorizationStatus() {
-        return RNCalendarUtil.getCalendarPermissions();
-    },
-
-    async authorizeEventStore() {
-        return RNCalendarUtil.requestCalendarPermissions();
-    },
-
-    async listCalendars() {
-        return RNCalendarUtil.listCalendars();
-    },
-
-    async createCalendar(name) {
-        return RNCalendarUtil.createCalendar(name);
-    },
-
-    async deleteCalendar(name) {
-        return RNCalendarUtil.deleteCalendar(name);
-    },
-
-    getCalendarOptions() {
-        return {
-            firstReminderMinutes: 60,
-            secondReminderMinutes: null,
-            recurrence: null, // options are: 'daily', 'weekly', 'monthly', 'yearly'
-            recurrenceInterval: 1, // only used when recurrence is set
-            recurrenceWeekstart: "MO",
-            recurrenceByDay: null,
-            recurrenceByMonthDay: null,
-            recurrenceEndDate: null,
-            recurrenceCount: null,
-            allday: null,
-            calendarId: null,
-            url: null
-        };
-    },
-
-    async createEvent(title, location, notes, startTimeMS, endTimeMS) {
-        return createEventWithOptions(title, location, notes, startTimeMS, endTimeMS, getCalendarOptions());
-    },
-
-    async createEventWithOptions(title, location, notes, startTimeMS, endTimeMS, options) {
-        return RNCalendarUtil.createEventWithOptions(title, location, notes, startTimeMS, endTimeMS, options);
-    }
+if (Platform.OS === 'ios') {
+    RNCalendarUtil = require('./index.ios').default;
+} else {
+    RNCalendarUtil = require('./index.android').default;
 }
+
+export default RNCalendarUtil;

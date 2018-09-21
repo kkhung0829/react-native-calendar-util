@@ -47,39 +47,6 @@ public class RNCalendarUtilModule extends ReactContextBaseJavaModule {
     return "RNCalendarUtil";
   }
 
-  //region Calendar Permissions
-  private void requestCalendarReadWritePermission(final Promise promise)
-  {
-    Activity currentActivity = getCurrentActivity();
-    if (currentActivity == null) {
-      promise.reject("E_ACTIVITY_DOES_NOT_EXIST", "Activity doesn't exist");
-      return;
-    }
-    PERMISSION_REQUEST_CODE++;
-    permissionsPromises.put(PERMISSION_REQUEST_CODE, promise);
-    ActivityCompat.requestPermissions(currentActivity, new String[]{
-            Manifest.permission.WRITE_CALENDAR,
-            Manifest.permission.READ_CALENDAR
-    }, PERMISSION_REQUEST_CODE);
-  }
-
-  public static void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-    if (permissionsPromises.containsKey(requestCode)) {
-
-      // If request is cancelled, the result arrays are empty.
-      Promise permissionsPromise = permissionsPromises.get(requestCode);
-
-      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        permissionsPromise.resolve("authorized");
-      } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-        permissionsPromise.resolve("denied");
-      } else if (permissionsPromises.size() == 1) {
-        permissionsPromise.reject("permissions - unknown error", grantResults.length > 0 ? String.valueOf(grantResults[0]) : "Request was cancelled");
-      }
-      permissionsPromises.remove(requestCode);
-    }
-  }
-
   private boolean haveCalendarReadWritePermissions() {
     int writePermission = ContextCompat.checkSelfPermission(reactContext, Manifest.permission.WRITE_CALENDAR);
     int readPermission = ContextCompat.checkSelfPermission(reactContext, Manifest.permission.READ_CALENDAR);
@@ -90,34 +57,6 @@ public class RNCalendarUtilModule extends ReactContextBaseJavaModule {
   //endregion
 
   //region React Native Methods
-  @ReactMethod
-  public void getCalendarPermissions(Promise promise) {
-    SharedPreferences sharedPreferences = reactContext.getSharedPreferences(RNC_PREFS, ReactContext.MODE_PRIVATE);
-    boolean permissionRequested = sharedPreferences.getBoolean("permissionRequested", false);
-
-    if (this.haveCalendarReadWritePermissions()) {
-      promise.resolve("authorized");
-    } else if (!permissionRequested) {
-      promise.resolve("undetermined");
-    } else {
-      promise.resolve("denied");
-    }
-  }
-
-  @ReactMethod
-  public void requestCalendarPermissions(Promise promise) {
-    SharedPreferences sharedPreferences = reactContext.getSharedPreferences(RNC_PREFS, ReactContext.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putBoolean("permissionRequested", true);
-    editor.apply();
-
-    if (this.haveCalendarReadWritePermissions()) {
-      promise.resolve("authorized");
-    } else {
-      this.requestCalendarReadWritePermission(promise);
-    }
-  }
-
   @ReactMethod
   public void listCalendars(final Promise promise) {
     if (this.haveCalendarReadWritePermissions()) {
