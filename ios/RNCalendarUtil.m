@@ -149,8 +149,8 @@ RCT_EXPORT_METHOD(listCalendars:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
                                             @"name": calendar.title ? calendar.title : @"",
                                             @"allowsModifications": @(calendar.allowsContentModifications),
                                             @"source": calendar.source && calendar.source.title ? calendar.source.title : @"",
-                                            @"allowedAvailabilities": [self calendarSupportedAvailabilitiesFromMask:calendar.supportedEventAvailabilities],
-                                            @"color": [self hexStringFromColor:[UIColor colorWithCGColor:calendar.CGColor]]
+                                            @"allowedAvailabilities": [strongSelf calendarSupportedAvailabilitiesFromMask:calendar.supportedEventAvailabilities],
+                                            @"color": [strongSelf hexStringFromColor:[UIColor colorWithCGColor:calendar.CGColor]]
                                             }];
             }
             resolve(eventCalendars);
@@ -173,7 +173,7 @@ RCT_EXPORT_METHOD(createCalendar:(NSString *)calendarName resolver:(RCTPromiseRe
         if (cal == nil) {
             cal = [EKCalendar calendarForEntityType:EKEntityTypeEvent eventStore:strongSelf.eventStore];
             cal.title = calendarName;
-            cal.source = [self findEKSource];
+            cal.source = [strongSelf findEKSource];
 
             // if the user did not allow permission to access the calendar, the error Object will be filled
             NSError* error;
@@ -201,7 +201,7 @@ RCT_EXPORT_METHOD(deleteCalendar:(NSString *)calendarName resolver:(RCTPromiseRe
     __weak RNCalendarUtil *weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         RNCalendarUtil *strongSelf = weakSelf;
-        EKCalendar *thisCalendar = [self findEKCalendar:calendarName];
+        EKCalendar *thisCalendar = [strongSelf findEKCalendar:calendarName];
 
         if (thisCalendar == nil) {
             resolve(@(YES));
