@@ -1,8 +1,24 @@
 
 #import "RNCalendarUtil.h"
+#import <React/RCTConvert.h>
+#import <EventKitUI/EventKitUI.h>
 #import <EventKit/EventKit.h>
 
 @implementation RNCalendarUtil
+
+- (NSString *)hexStringFromColor:(UIColor *)color {
+    const CGFloat *components = CGColorGetComponents(color.CGColor);
+    
+    CGFloat r = components[0];
+    CGFloat g = components[1];
+    CGFloat b = components[2];
+    
+    return [NSString stringWithFormat:@"#%02lX%02lX%02lX",
+            lroundf(r * 255),
+            lroundf(g * 255),
+            lroundf(b * 255)];
+}
+
 @synthesize eventStore;
 
 - (dispatch_queue_t)methodQueue
@@ -85,6 +101,20 @@ RCT_EXPORT_MODULE()
   return nil;
 }
 
+- (EKRecurrenceFrequency) toEKRecurrenceFrequency:(NSString*) recurrence {
+    if ([recurrence isEqualToString:@"daily"]) {
+        return EKRecurrenceFrequencyDaily;
+    } else if ([recurrence isEqualToString:@"weekly"]) {
+        return EKRecurrenceFrequencyWeekly;
+    } else if ([recurrence isEqualToString:@"monthly"]) {
+        return EKRecurrenceFrequencyMonthly;
+    } else if ([recurrence isEqualToString:@"yearly"]) {
+        return EKRecurrenceFrequencyYearly;
+    }
+    // default to daily, so invoke this method only when recurrence is set
+    return EKRecurrenceFrequencyDaily;
+}
+
 #pragma mark Event Store Authorization
 
 - (BOOL)isCalendarAccessGranted
@@ -92,6 +122,19 @@ RCT_EXPORT_MODULE()
     EKAuthorizationStatus status = [EKEventStore authorizationStatusForEntityType:EKEntityTypeEvent];
 
     return status == EKAuthorizationStatusAuthorized;
+}
+
+#pragma mark Availability
+- (NSMutableArray *)calendarSupportedAvailabilitiesFromMask:(EKCalendarEventAvailabilityMask)types
+{
+    NSMutableArray *availabilitiesStrings = [[NSMutableArray alloc] init];
+    
+    if(types & EKCalendarEventAvailabilityBusy) [availabilitiesStrings addObject:@"busy"];
+    if(types & EKCalendarEventAvailabilityFree) [availabilitiesStrings addObject:@"free"];
+    if(types & EKCalendarEventAvailabilityTentative) [availabilitiesStrings addObject:@"tentative"];
+    if(types & EKCalendarEventAvailabilityUnavailable) [availabilitiesStrings addObject:@"unavailable"];
+    
+    return availabilitiesStrings;
 }
 
 #pragma mark RCT Exports
@@ -221,8 +264,8 @@ RCT_EXPORT_METHOD(deleteCalendar:(NSString *)calendarName resolver:(RCTPromiseRe
 RCT_EXPORT_METHOD(createEventWithOptions:(NSString *)title
     location: (NSString *)location
     notes: (NSString *)notes
-    startTimeMS: NSNumber startTimeMS
-    endTimeMS: NSNumber endTimeMS
+    startTimeMS: (NSNumber *)startTimeMS
+    endTimeMS: (NSNumber *)endTimeMS
     options: (NSDictionary *) options
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject)
@@ -323,7 +366,7 @@ RCT_EXPORT_METHOD(createEventWithOptions:(NSString *)title
         if (error) {
             reject(@"error", @"Fail to save event", error);
         } else {
-            resolve(myEvent.calendarIdentifier);
+            resolve(myEvent.calendarItemIdentifier);
         }
     });
 }
