@@ -29,10 +29,16 @@ RCT_EXPORT_MODULE()
 
 #pragma mark Event Store Initialize
 
++ (BOOL)requiresMainQueueSetup
+{
+    return NO;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
-        [self initEventStoreWithCalendarCapabilities];
+        // [self initEventStoreWithCalendarCapabilities];
+        _eventStore = [[EKEventStore alloc] init];
     }
     return self;
 }
