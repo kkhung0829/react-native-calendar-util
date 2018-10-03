@@ -1,8 +1,12 @@
 
 #import "RNCalendarUtil.h"
 #import <React/RCTConvert.h>
-#import <EventKitUI/EventKitUI.h>
+#import <React/RCTUtils.h>
 #import <EventKit/EventKit.h>
+
+@interface RNCalendarUtil ()
+@property (nonatomic, retain) EKEventStore *eventStore;
+@end
 
 @implementation RNCalendarUtil
 
@@ -19,12 +23,8 @@
             lroundf(b * 255)];
 }
 
-@synthesize eventStore;
+@synthesize bridge = _bridge;
 
-- (dispatch_queue_t)methodQueue
-{
-    return dispatch_get_main_queue();
-}
 RCT_EXPORT_MODULE()
 
 #pragma mark Event Store Initialize
