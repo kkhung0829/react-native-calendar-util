@@ -270,8 +270,8 @@ RCT_EXPORT_METHOD(deleteCalendar:(NSString *)calendarName resolver:(RCTPromiseRe
 RCT_EXPORT_METHOD(createEventWithOptions:(NSString *)title
     location: (NSString *)location
     notes: (NSString *)notes
-    startTimeMS: (NSNumber *)startTimeMS
-    endTimeMS: (NSNumber *)endTimeMS
+    startTimeMS: (nonnull NSNumber *)startTimeMS
+    endTimeMS: (nonnull NSNumber *)endTimeMS
     options: (NSDictionary *) options
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject)
@@ -281,19 +281,19 @@ RCT_EXPORT_METHOD(createEventWithOptions:(NSString *)title
         return;
     }
 
-    NSNumber* firstReminderMinutes = [RCTConvert NSNumber:options[@"firstReminderMinutes"]];
-    NSNumber* secondReminderMinutes = [RCTConvert NSNumber:options[@"secondReminderMinutes"]];
-    NSString* recurrence = [RCTConvert NSString:options[@"recurrence"]];
-    NSString* recurrenceEndTime = [RCTConvert NSString:options[@"recurrenceEndTime"]];
-    NSNumber* recurrenceIntervalAmount = [RCTConvert NSNumber:options[@"recurrenceInterval"]];
-    NSString* calendarName = [RCTConvert NSString:options[@"calendarName"]];
-    NSString* url = [RCTConvert NSString:options[@"url"]];
+    NSNumber* firstReminderMinutes = options[@"firstReminderMinutes"] != [NSNull null] ? [RCTConvert NSNumber:options[@"firstReminderMinutes"]] : nil;
+    NSNumber* secondReminderMinutes = options[@"secondReminderMinutes"] != [NSNull null] ? [RCTConvert NSNumber:options[@"secondReminderMinutes"]] : nil;
+    NSString* recurrence = options[@"recurrence"] != [NSNull null] ? [RCTConvert NSString:options[@"recurrence"]] : nil;
+    NSString* recurrenceEndTime = options[@"recurrenceEndTime"] != [NSNull null] ? [RCTConvert NSString:options[@"recurrenceEndTime"]] : nil;
+    NSNumber* recurrenceIntervalAmount = options[@"recurrenceInterval"] != [NSNull null] ? [RCTConvert NSNumber:options[@"recurrenceInterval"]] : nil;
+    NSString* calendarId = options[@"calendarId"] != [NSNull null] ? [RCTConvert NSString:options[@"calendarId"]] : nil;
+    NSString* url = options[@"url"] != [NSNull null] ? [RCTConvert NSString:options[@"url"]] : nil;
 
     __weak RNCalendarUtil *weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         RNCalendarUtil *strongSelf = weakSelf;
         EKEvent *myEvent = [EKEvent eventWithEventStore: strongSelf.eventStore];
-        if (url != (id)[NSNull null]) {
+        if (url) {
             NSURL* myUrl = [NSURL URLWithString:url];
             myEvent.URL = myUrl;
         }
@@ -318,41 +318,29 @@ RCT_EXPORT_METHOD(createEventWithOptions:(NSString *)title
         }
 
         EKCalendar* calendar = nil;
-        if (calendarName == (id)[NSNull null]) {
+        if (calendarId) {
+            calendar = [strongSelf findEKCalendar:calendarId];
+        }
+        if (!calendar) {
             calendar = strongSelf.eventStore.defaultCalendarForNewEvents;
             if (calendar == nil) {
                 reject(@"error", @"No default calendar found", nil);
                 return;
             }
-        } else {
-            calendar = [strongSelf findEKCalendar:calendarName];
-            if (calendar == nil) {
-                // create it
-                calendar = [EKCalendar calendarForEntityType:EKEntityTypeEvent eventStore:strongSelf.eventStore];
-                calendar.title = calendarName;
-                calendar.source = [strongSelf findEKSource];
-                NSError* error;
-                [strongSelf.eventStore saveCalendar:calendar commit:YES error:&error];
-                if (error != nil) {
-                    NSLog(@"could not create calendar, error: %@", error.description);
-                    reject(@"error", @"Could not create calendar", error);
-                    return;
-                }
-            }
         }
         myEvent.calendar = calendar;
 
-        if (firstReminderMinutes != (id)[NSNull null]) {
+        if (firstReminderMinutes) {
             EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*firstReminderMinutes.intValue*60];
             [myEvent addAlarm:reminder];
         }
 
-        if (secondReminderMinutes != (id)[NSNull null]) {
+        if (secondReminderMinutes) {
             EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*secondReminderMinutes.intValue*60];
             [myEvent addAlarm:reminder];
         }
 
-        if (recurrence != (id)[NSNull null]) {
+        if (recurrence) {
             EKRecurrenceRule *rule = [[EKRecurrenceRule alloc]
                                         initRecurrenceWithFrequency: [strongSelf toEKRecurrenceFrequency:recurrence]
                                         interval: recurrenceIntervalAmount.integerValue
