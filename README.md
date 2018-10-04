@@ -27,7 +27,7 @@ The following is **required** for the package to work properly.
 Install the `react-native-calendar-util` library with native code.
 
 ```
-npm install --save kkhung0829/react-native-calendar-util
+npm install --save github:kkhung0829/react-native-calendar-util
 ```
 
 ### Step 2. - Link the library
