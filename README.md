@@ -41,11 +41,17 @@ react-native link
 + **Manual linking**<br/>
 Sometimes "automatic linking" is not sufficient or is not properly including the library. Fortunately, the React Native docs on ["Manual Linking"](https://facebook.github.io/react-native/docs/linking-libraries-ios.html#manual-linking) serves a helpful guide (with pictures) in the process.
 
-### Step 3. - OS specific setup
+### Step 3. - iOS setup
+Setting up privacy usage descriptions may also be require depending on which iOS version is supported. This involves updating the Property List, Info.plist, with the corresponding key for the EKEventStore api. [Info.plist reference](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html)
 
-- [**iOS specific instructions**](https://github.com/wmcmahan/react-native-calendar-events/wiki/iOS-setup)<br/> iOS specific requirements, such as mandatory privacy usage descriptions and including the `EventKit.framework`.
+For updating the Info.plist key/value via XCode, add a Privacy - Calendars Usage Description key with a usage description as the value. Resulting change to Info.plist should look something like:
 
-- [**Android specific instructions**](https://github.com/wmcmahan/react-native-calendar-events/wiki/Android-setup)<br/> Android specific requirements, such as mandatory application permissions.
+```
+<key>NSCalendarsUsageDescription</key>
+<string>This app requires access to the calendar</string>
+```
+
+> Note that for iOS react-native link will not automatically add the required privacy usage description to your Info.plist file, you'll need to do that manually.
 
 <br/>
 
